@@ -1,0 +1,44 @@
+# Pertama Check server anda atau VM anda :
+# Cek arsitektur CPU:
+uname -m
+# x86_64 → pakai amd64, amd64-simd, atau amd64-musl
+# aarch64 atau arm64 → pakai arm64
+
+# Cek apakah CPU mendukung SIMD (AVX2) :
+grep -o 'avx2' /proc/cpuinfo | head -1
+# Kalau muncul avx2 → CPU Anda mendukung, bisa pakai amd64-simd (lebih cepat)
+# Kalau kosong/tidak muncul → pakai amd64 biasa saja (aman, kompatibel)
+
+# Cek apakah sistem Anda pakai musl atau glibc:
+ldd --version
+# Kalau muncul info glibc → pakai amd64 atau amd64-simd
+# Kalau perintah ldd tidak ada / Anda tahu pakai Alpine Linux → pakai amd64-musl
+
+# Cara cepat gabungan (copy-paste satu baris):
+echo "Arch: $(uname -m)"; echo "AVX2: $(grep -o avx2 /proc/cpuinfo | head -1 || echo 'not supported')"; cat /etc/os-release | grep -i "^ID="
+# contoh hasilnya :
+# Arch: x86_64
+# AVX2: avx2
+# ID=ubuntu
+
+# dowload bisa di portal resmi openobserve ada 2 model dan 3 pilihan download menyesuaikan dengan spek server diatas
+# 1. enterprice
+# 2. open source
+
+# contoh pilihannya untuk open source :
+#For arm64
+curl -L -o openobserve-v0.91.3-linux-arm64.tar.gz https://downloads.openobserve.ai/releases/openobserve/v0.91.3/openobserve-v0.91.3-linux-arm64.tar.gz && tar -xzf openobserve-v0.91.3-linux-arm64.tar.gz
+
+
+#For amd64
+curl -L -o openobserve-v0.91.3-linux-amd64.tar.gz https://downloads.openobserve.ai/releases/openobserve/v0.91.3/openobserve-v0.91.3-linux-amd64.tar.gz && tar -xzf openobserve-v0.91.3-linux-amd64.tar.gz
+
+
+#For amd64-simd
+curl -L -o openobserve-v0.91.3-linux-amd64-simd.tar.gz https://downloads.openobserve.ai/releases/openobserve/v0.91.3/openobserve-v0.91.3-linux-amd64-simd.tar.gz && tar -xzf openobserve-v0.91.3-linux-amd64-simd.tar.gz
+
+
+#For amd64-musl
+curl -L -o openobserve-v0.91.3-linux-amd64-musl.tar.gz https://downloads.openobserve.ai/releases/openobserve/v0.91.3/openobserve-v0.91.3-linux-amd64-musl.tar.gz && tar -xzf openobserve-v0.91.3-linux-amd64-musl.tar.gz
+
+
