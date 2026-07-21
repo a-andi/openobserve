@@ -1,2 +1,33 @@
 Setelah persiapan sebelum nya dan download yang cocok dengan pilihan server nya maka akan tampil  :
 
+# Cek group openobserve sudah ada
+getent group openobserve
+
+# Kalau belum ada, buat dulu
+sudo groupadd openobserve
+
+# Pastikan user uoobserve masuk ke group openobserve
+sudo usermod -aG openobserve uoobserve
+
+# Verifikasi
+groups uoobserve
+
+# buat Folder
+sudo mkdir -p /opt/openobserve
+cd /opt/openobserve
+
+sudo mkdir -p /opt/openobserve/data
+sudo mkdir -p /opt/openobserve/config
+
+# Set ulang ownership semuanya (termasuk data & config)
+sudo chown -R a-andi:openobserve /opt/openobserve
+sudo chmod -R 750 /opt/openobserve
+
+# harusnya isi foldernya :
+ ls
+ # tampilan : config  data
+
+# download openobserve :
+# ini hanya contoh :
+# curl -L -o openobserve-v0.91.3-linux-amd64-simd.tar.gz https://downloads.openobserve.ai/releases/openobserve/v0.91.3/openobserve-v0.91.3-linux-amd64-simd.tar.gz && tar -xzf openobserve-v0.91.3-linux-amd64-simd.tar.gz
+
