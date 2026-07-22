@@ -1,0 +1,88 @@
+# persiapan ambil token  
+echo -n "user@example.com:yourpassword" | base64
+
+# buat Folder :
+sudo mkdir -p /opt/goflow2
+cd /opt/goflow2
+
+# set ownership
+sudo chown -R uoobserve:openobserve /opt/goflow2
+
+# download goflow
+sudo curl -L -o goflow2 \
+  https://github.com/openobserve/goflow2/releases/download/v100.0.1/goflow2-100.0.1-linux-x86_64
+
+# Buat file environment (kredensial terpisah, jangan hardcode di service file)
+sudo mkdir -p /opt/goflow2/config
+
+sudo tee /opt/goflow2/config/goflow2.env > /dev/null <<'EOF'
+HTTP_DESTINATION=http://you-IP:5080/api/default/netflow/_json
+HTTP_BATCHSIZE=1000
+HTTP_HEADER=Authorization
+HTTP_CREDENTIALS=Basic (your-Token)
+LISTEN_ADDR=netflow://:2055
+EOF
+
+sudo chown a-andi:openobserve /opt/goflow2/config/goflow2.env
+sudo chmod 640 /opt/goflow2/config/goflow2.env
+
+# Buat systemd service 
+sudo tee /etc/systemd/system/goflow2.service > /dev/null <<'EOF'
+[Unit]
+Description=GoFlow2 NetFlow/sFlow/IPFIX Collector (to OpenObserve)
+After=network.target openobserve.service
+
+[Service]
+Type=simple
+User=uoobserve
+Group=openobserve
+WorkingDirectory=/opt/goflow2
+EnvironmentFile=/opt/goflow2/config/goflow2.env
+ExecStart=/opt/goflow2/goflow2 \
+  -listen ${LISTEN_ADDR} \
+  -transport=http \
+  -transport.http.destination=${HTTP_DESTINATION} \
+  -transport.http.batchSize=${HTTP_BATCHSIZE} \
+  -transport.http.auth.header=${HTTP_HEADER} \
+  -transport.http.auth.credentials=${HTTP_CREDENTIALS}
+Restart=on-failure
+RestartSec=5
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload dan jalankan
+sudo systemctl daemon-reload
+sudo systemctl enable goflow2
+sudo systemctl start goflow2
+
+
+
+
+
+
+
+
+
+
+
+
+
+sudo chmod +x /opt/goflow2/goflow2
+#install goloang go :
+sudo apt update
+sudo apt install -y golang-go
+
+# cloning goflow :
+git clone https://github.com/nerdalert/nflow-generator.git
+cd nflow-generator
+go build
+
+# jalankan generator
+./nflow-generator -t 127.0.0.1 -p 2055
+
+# check apakah goflow ada
+sudo journalctl -u goflow2 -f
