@@ -30,4 +30,73 @@ sudo chmod -R 750 /opt/openobserve
 # download openobserve :
 # ini hanya contoh :
 # curl -L -o openobserve-v0.91.3-linux-amd64-simd.tar.gz https://downloads.openobserve.ai/releases/openobserve/v0.91.3/openobserve-v0.91.3-linux-amd64-simd.tar.gz && tar -xzf openobserve-v0.91.3-linux-amd64-simd.tar.gz
+#  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#                                 Dload  Upload   Total   Spent    Left  Speed
+# 100  111M  100  111M    0     0  12.4M      0  0:00:08  0:00:08 --:--:-- 15.8M
 
+# sekarang isi foldernya :
+ ls
+ # tampilan : config  data  openobserve  openobserve-v0.91.3-linux-amd64-simd.tar.gz
+
+# Buat file environment (konfigurasi) :
+sudo tee /opt/openobserve/config/openobserve.env > /dev/null <<'EOF'
+ZO_ROOT_USER_EMAIL=admin@example.com
+ZO_ROOT_USER_PASSWORD=GantiPasswordIni123!
+ZO_DATA_DIR=/opt/openobserve/data
+ZO_HTTP_PORT=5080
+ZO_HTTP_ADDR=0.0.0.0
+EOF
+
+sudo chown a-andi:openobserve /opt/openobserve/config/openobserve.env
+sudo chmod 640 /opt/openobserve/config/openobserve.env
+
+# Ganti admin@example.com dan password sesuai kebutuhan
+# cari binary nya :
+ls -la /opt/openobserve
+# Biasanya nama binarynya openobserve. Pastikan executable:
+sudo chmod +x /opt/openobserve/openobserve
+
+# Buat systemd service :
+sudo tee /etc/systemd/system/openobserve.service > /dev/null <<'EOF'
+[Unit]
+Description=OpenObserve Enterprise
+After=network.target
+
+[Service]
+Type=simple
+User=uoobserve
+Group=openobserve
+WorkingDirectory=/opt/openobserve
+EnvironmentFile=/opt/openobserve/config/openobserve.env
+ExecStart=/opt/openobserve/openobserve
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd & jalankan service
+sudo systemctl daemon-reload
+sudo systemctl enable openobserve
+sudo systemctl start openobserve
+
+# Verifikasi service berjalan :
+sudo systemctl status openobserve
+
+# Lihat log real-time
+sudo journalctl -u openobserve -f
+
+# Tes endpoint
+curl -i http://127.0.0.1:5080/healthz
+
+
+# Kalau muncul respons OK / status 200, berarti OpenObserve sudah jalan normal.
+
+# Buka akses dari luar (opsional) jika firewall / UFW status enable :
+# Jika pakai ufw
+sudo ufw allow 5080/tcp
+
+# selesai anda bisa coba membuka lewat browser :
+http://IP anda:5080
