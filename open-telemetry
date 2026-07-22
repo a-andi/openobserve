@@ -1,0 +1,119 @@
+sudo mkdir -p /opt/otelcol
+cd /opt/otelcol
+
+sudo curl -L -o otelcol-contrib.tar.gz \
+  https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.156.0/otelcol-contrib_0.156.0_linux_amd64.tar.gz
+
+sudo tar -xzf otelcol-contrib.tar.gz
+sudo chmod +x /opt/otelcol/otelcol-contrib
+sudo chown -R a-andi:openobserve /opt/otelcol
+
+sudo apt install -y snmp
+
+# Tes koneksi ke device SNMP target dulu, ganti IP & community sesuai device Anda
+snmpwalk -v 2c -c public 192.168.1.1 sysDescr.0
+
+sudo mkdir -p /opt/otelcol/config
+sudo tee /opt/otelcol/config/config.yaml > /dev/null <<'EOF'
+receivers:
+  snmp:
+    collection_interval: 60s
+    endpoint: udp://192.168.1.1:161      # ganti sesuai IP device target
+    version: v2c
+    community: public                     # ganti sesuai community string device
+
+    resource_attributes:
+      device.name:
+        scalar_oid: "1.3.6.1.2.1.1.5.0"   # sysName
+      device.location:
+        scalar_oid: "1.3.6.1.2.1.1.6.0"   # sysLocation
+
+    attributes:
+      interface.name:
+        oid: "1.3.6.1.2.1.2.2.1.2"        # ifDescr
+
+    metrics:
+      interface.status:
+        unit: "{status}"
+        description: "Operational status of the network interface (1=up, 2=down)"
+        gauge:
+          value_type: int
+        column_oids:
+          - oid: "1.3.6.1.2.1.2.2.1.8"    # ifOperStatus
+            attributes:
+              - name: interface.name
+
+      interface.in.octets:
+        unit: "By"
+        sum:
+          aggregation: cumulative
+          monotonic: true
+          value_type: int
+        column_oids:
+          - oid: "1.3.6.1.2.1.2.2.1.10"   # ifInOctets
+            attributes:
+              - name: interface.name
+
+      interface.out.octets:
+        unit: "By"
+        sum:
+          aggregation: cumulative
+          monotonic: true
+          value_type: int
+        column_oids:
+          - oid: "1.3.6.1.2.1.2.2.1.16"   # ifOutOctets
+            attributes:
+              - name: interface.name
+
+processors:
+  batch:
+    send_batch_size: 1000
+    timeout: 10s
+
+exporters:
+  otlphttp/openobserve:
+    endpoint: http://103.96.146.152:5080/api/default
+    headers:
+      Authorization: "Basic YW5kaUBlcmFueWFjbG91ZC5jb206bzJvaV9wYlZmQmd1eHdmUHRGaHdLTHhBVFp6V2FWdFVWVGR0cw=="
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    metrics:
+      receivers: [snmp]
+      processors: [batch]
+      exporters: [otlphttp/openobserve]
+EOF
+
+sudo chown a-andi:openobserve /opt/otelcol/config/config.yaml
+sudo chmod 640 /opt/otelcol/config/config.yaml
+
+
+sudo tee /etc/systemd/system/otelcol-snmp.service > /dev/null <<'EOF'
+[Unit]
+Description=OpenTelemetry Collector Contrib (SNMP to OpenObserve)
+After=network.target openobserve.service
+
+[Service]
+Type=simple
+User=a-andi
+Group=openobserve
+WorkingDirectory=/opt/otelcol
+ExecStart=/opt/otelcol/otelcol-contrib --config=/opt/otelcol/config/config.yaml
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable otelcol-snmp
+sudo systemctl start otelcol-snmp
+
+
+
+
