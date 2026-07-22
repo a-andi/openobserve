@@ -14,6 +14,8 @@ sudo curl -L -o goflow2 \
 
 # Buat file environment (kredensial terpisah, jangan hardcode di service file)
 sudo mkdir -p /opt/goflow2/config
+sudo chmod +x /opt/goflow2/goflow2
+
 
 sudo tee /opt/goflow2/config/goflow2.env > /dev/null <<'EOF'
 HTTP_DESTINATION=http://you-IP:5080/api/default/netflow/_json
@@ -60,18 +62,6 @@ sudo systemctl enable goflow2
 sudo systemctl start goflow2
 
 
-
-
-
-
-
-
-
-
-
-
-
-sudo chmod +x /opt/goflow2/goflow2
 #install goloang go :
 sudo apt update
 sudo apt install -y golang-go
@@ -86,3 +76,20 @@ go build
 
 # check apakah goflow ada
 sudo journalctl -u goflow2 -f
+
+
+# Lihat log service goflow2 (real-time)
+sudo journalctl -u goflow2 -f --no-pager
+
+# Biarkan terbuka, lalu di terminal lain jalankan generator test (kalau belum jalan):
+cd /opt/goflow2/nflow-generator
+./nflow-generator -t 127.0.0.1 -p 2055
+
+# Lihat log 100 baris terakhir (kalau tidak mau mode live)
+sudo journalctl -u goflow2 -n 100 --no-pager
+
+# Cek status service secara umum
+sudo systemctl status goflow2 --no-pager
+
+
+
