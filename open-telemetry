@@ -116,4 +116,20 @@ sudo systemctl start otelcol-snmp
 
 
 
+#Cek log
+sudo systemctl status otelcol-snmp --no-pager
+sudo journalctl -u otelcol-snmp -f --no-pager
+
+#Cek satu-satu ini di server:
+# 1. Cek file ada atau tidak
+ls -la /opt/otelcol/otelcol-contrib
+
+# 2. Cek permission execute (harus ada 'x')
+stat /opt/otelcol/otelcol-contrib
+
+# 3. Cek tipe file/arsitektur
+file /opt/otelcol/otelcol-contrib
+
+# 4. Coba jalankan manual buat lihat error aslinya
+/opt/otelcol/otelcol-contrib --config=/opt/otelcol/config/config.yaml
 
