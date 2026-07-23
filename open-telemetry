@@ -6,7 +6,7 @@ sudo curl -L -o otelcol-contrib.tar.gz \
 
 sudo tar -xzf otelcol-contrib.tar.gz
 sudo chmod +x /opt/otelcol/otelcol-contrib
-sudo chown -R a-andi:openobserve /opt/otelcol
+sudo chown -R uoobserve:openobserve /opt/otelcol
 
 sudo apt install -y snmp
 
