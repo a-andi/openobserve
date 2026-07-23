@@ -86,7 +86,7 @@ service:
       exporters: [otlphttp/openobserve]
 EOF
 
-sudo chown a-andi:openobserve /opt/otelcol/config/config.yaml
+sudo chown uoobserve:openobserve /opt/otelcol/config/config.yaml
 sudo chmod 640 /opt/otelcol/config/config.yaml
 
 
