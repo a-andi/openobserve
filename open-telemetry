@@ -97,7 +97,7 @@ After=network.target openobserve.service
 
 [Service]
 Type=simple
-User=a-andi
+User=uoobserve
 Group=openobserve
 WorkingDirectory=/opt/otelcol
 ExecStart=/opt/otelcol/otelcol-contrib --config=/opt/otelcol/config/config.yaml
