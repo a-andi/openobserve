@@ -25,7 +25,7 @@ HTTP_CREDENTIALS=Basic (your-Token)
 LISTEN_ADDR=netflow://:2055
 EOF
 
-sudo chown a-andi:openobserve /opt/goflow2/config/goflow2.env
+sudo chown uoobserve:openobserve /opt/goflow2/config/goflow2.env
 sudo chmod 640 /opt/goflow2/config/goflow2.env
 
 # Buat systemd service 
