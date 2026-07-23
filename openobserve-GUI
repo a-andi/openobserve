@@ -20,7 +20,7 @@ sudo mkdir -p /opt/openobserve/data
 sudo mkdir -p /opt/openobserve/config
 
 # Set ulang ownership semuanya (termasuk data & config)
-sudo chown -R a-andi:openobserve /opt/openobserve
+sudo chown -R uoobserve:openobserve /opt/openobserve
 sudo chmod -R 750 /opt/openobserve
 
 # harusnya isi foldernya :
@@ -47,7 +47,7 @@ ZO_HTTP_PORT=5080
 ZO_HTTP_ADDR=0.0.0.0
 EOF
 
-sudo chown a-andi:openobserve /opt/openobserve/config/openobserve.env
+sudo chown uoobserve:openobserve /opt/openobserve/config/openobserve.env
 sudo chmod 640 /opt/openobserve/config/openobserve.env
 
 # Ganti admin@example.com dan password sesuai kebutuhan
