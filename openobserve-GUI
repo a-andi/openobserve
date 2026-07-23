@@ -27,7 +27,7 @@ sudo chmod -R 750 /opt/openobserve
  ls
  # tampilan : config  data
 
-# download openobserve :
+# download openobserve : "https://openobserve.ai/downloads/"
 # ini hanya contoh :
 # curl -L -o openobserve-v0.91.3-linux-amd64-simd.tar.gz https://downloads.openobserve.ai/releases/openobserve/v0.91.3/openobserve-v0.91.3-linux-amd64-simd.tar.gz && tar -xzf openobserve-v0.91.3-linux-amd64-simd.tar.gz
 #  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
