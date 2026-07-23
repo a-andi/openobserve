@@ -1,0 +1,35 @@
+sudo apt update
+sudo apt install -y syslog-ng syslog-ng-mod-http
+
+# Cek modul HTTP aktif:
+syslog-ng-ctl --version | grep -i http
+
+# atau
+yslog-ng -V | grep http
+
+
+sudo tee /etc/syslog-ng/conf.d/openobserve.conf > /dev/null <<'EOF'
+@include "scl.conf"
+
+source s_network {
+  udp(ip("0.0.0.0") port(514));
+  tcp(ip("0.0.0.0") port(514));
+};
+
+destination d_openobserve {
+  openobserve-log(
+    url("http://103.96.146.152")
+    port(5080)
+    organization("default")
+    stream("network_syslog")
+    user("andi@eranyacloud.com")
+    password("o2oi_pbVfBguxwfPtFhwKLxATZzWaVtUVTdts")
+  );
+};
+
+log {
+  source(s_network);
+  destination(d_openobserve);
+  flags(flow-control);
+};
+EOF
