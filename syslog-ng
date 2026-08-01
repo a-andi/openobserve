@@ -33,3 +33,38 @@ log {
   flags(flow-control);
 };
 EOF
+
+
+# upgrade syslog-ng
+# 1. Simpan release signing key
+wget -qO - https://ose-repo.syslog-ng.com/apt/syslog-ng-ose-pub.asc | sudo gpg --dearmor -o /etc/apt/keyrings/syslog-ng-ose.gpg
+
+# 2. Tambahkan repo stable untuk Ubuntu 24.04 (noble)
+echo "deb [signed-by=/etc/apt/keyrings/syslog-ng-ose.gpg] https://ose-repo.syslog-ng.com/apt/ stable ubuntu-noble" | sudo tee /etc/apt/sources.list.d/syslog-ng-ose.list
+
+# 3. Update & upgrade
+sudo apt update
+sudo apt install -y syslog-ng-core syslog-ng-scl syslog-ng-mod-http
+
+Setelah itu, cek versi lagi:
+
+bash
+syslog-ng -V | head -5
+
+Pastikan sudah ≥ 4.5.0. Kalau sudah, lanjut cek syntax config kamu:
+
+bash
+sudo syslog-ng -s
+
+Kalau bersih (tanpa Error parsing config), lanjut:
+
+bash
+sudo systemctl restart syslog-ng
+sudo systemctl status syslog-ng
+
+Lalu test kirim log:
+
+bash
+logger -n 127.0.0.1 -P 20514 -d "test dari syslog-ng"
+
+
