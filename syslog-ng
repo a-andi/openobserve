@@ -5,7 +5,7 @@ sudo apt install -y syslog-ng syslog-ng-mod-http
 syslog-ng-ctl --version | grep -i http
 
 # atau
-yslog-ng -V | grep http
+syslog-ng -V | grep http
 
 
 sudo tee /etc/syslog-ng/conf.d/openobserve.conf > /dev/null <<'EOF'
