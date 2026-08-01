@@ -22,8 +22,8 @@ destination d_openobserve {
     port(5080)
     organization("default")
     stream("network_syslog")
-    user("andi@eranyacloud.com")
-    password("o2oi_pbVfBguxwfPtFhwKLxATZzWaVtUVTdts")
+    user("admin@domain.com")
+    password("key saat | 64 ")
   );
 };
 
