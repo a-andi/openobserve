@@ -67,4 +67,31 @@ Lalu test kirim log:
 bash
 logger -n 127.0.0.1 -P 20514 -d "test dari syslog-ng"
 
+# Cek apakah (IP Device) pernah mengirim log (cari di data yang sudah ada):
 
+START=$(($(date -d '24 hours ago' +%s) * 1000000))
+END=$(($(date +%s) * 1000000))
+
+curl -s -u "nama login.com:PASSWORD_ASLI_KAMU" \
+  -X POST "http://ip server:5080/api/default/_search" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"query\": {
+      \"sql\": \"SELECT * FROM network_syslog WHERE host='ip device' ORDER BY _timestamp DESC LIMIT 5\",
+      \"start_time\": $START,
+      \"end_time\": $END
+    }
+  }" | python3 -m json.tool
+
+# Sekaligus cek breakdown semua host yang pernah tercatat (biar kelihatan gambaran lengkap, termasuk apakah ip device ada tapi dengan format berbeda):
+
+curl -s -u "nama login.com:PASSWORD_ASLI_KAMU" \
+  -X POST "http://ip server:5080/api/default/_search" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"query\": {
+      \"sql\": \"SELECT host, COUNT(*) as jumlah FROM network_syslog GROUP BY host\",
+      \"start_time\": $START,
+      \"end_time\": $END
+    }
+  }" | python3 -m json.tool
