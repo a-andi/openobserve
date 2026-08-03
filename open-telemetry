@@ -74,7 +74,7 @@ exporters:
   otlphttp/openobserve:
     endpoint: http://103.96.146.152:5080/api/default
     headers:
-      Authorization: "Basic YW5kaUBlcmFueWFjbG91ZC5jb206bzJvaV9wYlZmQmd1eHdmUHRGaHdLTHhBVFp6V2FWdFVWVGR0cw=="
+      Authorization: "Basic (hasil_dari_echo -n "user@example.com:yourpassword" | base64)"
     tls:
       insecure: true
 
